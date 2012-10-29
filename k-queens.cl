@@ -18,7 +18,7 @@
 (defparameter *board* nil)
 
 (defun generate-random-board (size)
-  "Generates a size-x-size board with randomly placed queens."
+  "Generates a size-by-size board with randomly placed queens."
   (loop for i from 1 to size collect (random size)))
 
 (defun print-board (board)
@@ -54,7 +54,17 @@
          (diagonal-attacks board row (1+ other-row) (1+ result))
          (diagonal-attacks board row (1+ other-row) result))))))
 
+(defun solutionp (board &optional (row 0))
+  "Returns true if the board contains no queens in attack position,
+   nil otherwise."
+  (cond
+    ((= row (length board)) t)                    ; no attacks found
+    ((or (> (vertical-attacks board row) 0)
+         (> (diagonal-attacks board row) 0)) nil) ; attack found, return early
+    (t (solutionp board (1+ row)))))              ; we're not done yet, recur
+
 (defun main (&optional (k 8))
   (progn
     (setf *k* k)
-    (setf *board* (generate-random-board *k*))))
+    (setf *board* (generate-random-board *k*))
+    (print-board *board*)))
