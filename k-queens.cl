@@ -1,21 +1,18 @@
 (in-package :common-lisp-user)
 
-;;;; The package ORG.ELDHUSET.K-QUEENS contains code for solving
+;;;; The package ORG.ELDHUSET.K-QUEENS provides functions for solving
 ;;;; the K queens problem as a CSP (constraint satisfaction problem)
 ;;;; using local search.
 (defpackage :org.eldhuset.k-queens
   (:use :common-lisp))
+
 (in-package :org.eldhuset.k-queens)
 
-;; *k* is the number of queens, rows and columns.
-(defparameter *k* 8)
-
-;; *board* is a list representing our checkerboard; each element represents
-;; a row and its value the index of the column where the queen is located.
-(defparameter *board* nil)
-
 (defun generate-random-board (size)
-  "Generates a size-by-size board with randomly placed queens."
+  "Generates a size-by-size board with randomly placed queens.
+
+   A board is a list in which each element represents a row and its value
+   represents the column where the queen is located."
   (loop for i from 1 to size collect (random size)))
 
 (defun print-board (board)
@@ -33,7 +30,7 @@
 (defun vertical-attacks (board row)
   "Returns the number of vertical attacks for the row-th queen on the board."
   (let ((column (elt board row)))
-    (- (count column board) 1)))
+    (1- (count column board))))
 
 (defun diagonal-attacks (board row &optional (other-row 0) (result 0))
   "Returns the number of diagonal attacks for the row-th queen on the board."
@@ -78,7 +75,7 @@
     (setf (elt new-board queen) column)
     new-board))
 
-(defun min-conflicts (board &optional (max-iterations 1000) (iteration 1))
+(defun min-conflicts (board &optional (max-iterations 100000) (iteration 1))
   "Attempts to solve the K queens problem represented by the given checkerboard.
    Returns the solution if found, else nil. The board is mutated regardless.
 
@@ -98,15 +95,4 @@
                   (<= (total-attacks (copy-and-move-queen board queen i) queen)
                       current-attacks))
            (move-queen board queen i)))
-     (min-conflicts board max-iterations (1+ iteration))))))
-
-
-(defun main (&optional (k 8))
-  (progn
-    (setf *k* k)
-    (setf *board* (generate-random-board *k*))
-    (print-board *board*)
-    (format t "~%")
-    (min-conflicts *board*)
-    (if *board*
-      (print-board *board*))))
+       (min-conflicts board max-iterations (1+ iteration))))))
